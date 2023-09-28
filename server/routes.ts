@@ -3,8 +3,7 @@ import { Filter, ObjectId } from "mongodb";
 import { Router, getExpressRouter } from "./framework/router";
 
 import { Post, User, WebSession } from "./app";
-import { NotAllowedError } from "./concepts/errors";
-import { PostDoc } from "./concepts/post";
+import { PostAuthorNotMatchError, PostDoc } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 
@@ -68,7 +67,7 @@ class Routes {
     const user = WebSession.getUser(session);
     const post = await Post.readById(_id);
     if (post?.author !== user) {
-      throw new NotAllowedError("Post can be deleted only by its author.");
+      throw new PostAuthorNotMatchError(user, _id);
     }
     return Post.delete(_id);
   }
